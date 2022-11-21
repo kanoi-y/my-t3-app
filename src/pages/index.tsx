@@ -29,6 +29,7 @@ const Home: NextPage = () => {
 export default Home;
 
 // TODO: 削除と更新のUIを作成して検証する
+// TODO: TodoListをコンポーネント化する
 const TodoList: FC = () => {
   const utils = trpc.useContext();
   const todos = trpc.todo.getTodos.useQuery();

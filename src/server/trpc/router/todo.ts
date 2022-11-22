@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { publicProcedure, router } from "../trpc";
 
-// TODO: todoRouterを作成する
 export const todoRouter = router({
   getTodos: publicProcedure.query(({ ctx }) => {
     if (!ctx.session?.user) {

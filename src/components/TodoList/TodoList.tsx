@@ -7,7 +7,11 @@ export const TodoList: FC = () => {
   const todos = trpc.todo.getTodos.useQuery();
   const createTodo = trpc.todo.createTodo.useMutation({
     async onSuccess() {
-      // refetches posts after a post is added
+      await utils.todo.getTodos.invalidate();
+    },
+  });
+  const deleteTodo = trpc.todo.deleteTodo.useMutation({
+    async onSuccess() {
       await utils.todo.getTodos.invalidate();
     },
   });
@@ -18,6 +22,12 @@ export const TodoList: FC = () => {
     if (todoTitle.trim().length === 0) return;
     await createTodo.mutateAsync({ title: todoTitle });
     setTodoTitle("");
+  };
+
+  const handleDelete = async (todoId: string) => {
+    const isOk = confirm("削除しますか？");
+    if (!isOk) return;
+    await deleteTodo.mutateAsync({ id: todoId });
   };
 
   return (
@@ -34,7 +44,12 @@ export const TodoList: FC = () => {
       <div>
         {todos.data ? (
           todos.data.map((todo) => {
-            return <div key={todo.id}>{todo.title}</div>;
+            return (
+              <div key={todo.id}>
+                <div className="text-white">{todo.title}</div>
+                <button onClick={() => handleDelete(todo.id)}>🗑</button>
+              </div>
+            );
           })
         ) : (
           <div>Loading...</div>

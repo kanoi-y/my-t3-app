@@ -2,14 +2,17 @@ import { z } from "zod";
 
 import { publicProcedure, router } from "../trpc";
 
-// TODO: todoRouterを作成する
 export const todoRouter = router({
   getTodos: publicProcedure.query(({ ctx }) => {
     if (!ctx.session?.user) {
       throw new Error("ログインユーザーが存在しません");
     }
 
-    return ctx.prisma.todo.findMany();
+    return ctx.prisma.todo.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
   }),
   getTodoById: publicProcedure
     .input(z.object({ id: z.string().min(1) }))

@@ -8,7 +8,11 @@ export const todoRouter = router({
       throw new Error("ログインユーザーが存在しません");
     }
 
-    return ctx.prisma.todo.findMany();
+    return ctx.prisma.todo.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
   }),
   getTodoById: publicProcedure
     .input(z.object({ id: z.string().min(1) }))

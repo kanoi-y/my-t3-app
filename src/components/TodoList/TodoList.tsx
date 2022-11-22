@@ -16,6 +16,12 @@ export const TodoList: FC = () => {
     },
   });
 
+  const updateTodo = trpc.todo.updateTodo.useMutation({
+    async onSuccess() {
+      await utils.todo.getTodos.invalidate();
+    },
+  });
+
   const [todoTitle, setTodoTitle] = useState("");
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -28,6 +34,10 @@ export const TodoList: FC = () => {
     const isOk = confirm("削除しますか？");
     if (!isOk) return;
     await deleteTodo.mutateAsync({ id: todoId });
+  };
+
+  const handleChange = async (todoId: string, completed: boolean) => {
+    await updateTodo.mutateAsync({ id: todoId, completed });
   };
 
   return (
@@ -46,7 +56,15 @@ export const TodoList: FC = () => {
           todos.data.map((todo) => {
             return (
               <div key={todo.id}>
-                <div className="text-white">{todo.title}</div>
+                <div className="text-white">
+                  {todo.completed ? "✅" : "👀"} {todo.title}
+                </div>
+                <input
+                  className="cursor-pointer"
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={(e) => handleChange(todo.id, e.target.checked)}
+                />
                 <button onClick={() => handleDelete(todo.id)}>🗑</button>
               </div>
             );
